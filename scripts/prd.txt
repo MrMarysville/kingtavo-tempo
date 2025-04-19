@@ -1,0 +1,207 @@
+<context>
+# Overview  
+Kingtavo is a multi-tenant ERP + employee-store solution merging Printavo's production management capabilities with KingClothing's e-commerce storefront. It serves screen printing and embroidery businesses by providing a unified platform for quoting, ordering, production tracking, inventory management, and customer-facing e-commerce experiences. The platform solves the challenge of disparate systems by bringing operations, sales, and customer interactions into a cohesive ecosystem with real-time data synchronization.
+
+# Core Features  
+## Multi-tenant Architecture
+- Securely isolates data between different decoration businesses (tenants)
+- Implements Row-Level Security (RLS) for strict data separation
+- Allows for tenant-specific configurations, workflows, and branding
+
+## Quote & Order Management
+- Guided quote builder with decoration-specific options (ink/thread types, placement, techniques)
+- AI-driven pricing suggestions and setup-fee calculations
+- Quote-to-order conversion with automated task generation
+- Order tracking and status updates visible to both staff and customers
+
+## Production Management
+- Task engine that automatically generates appropriate tasks by decoration technique
+- Kanban/calendar views optimized for shop floor use with mobile interfaces
+- Real-time status updates using Supabase Realtime
+- Press/machine scheduling with color sequence optimization
+
+## Product Catalog & Inventory
+- Multi-tenant catalog with variants, pricing tiers, and decoration constraints
+- Integration with apparel vendors (SanMar, S&S Activewear)
+- Inventory tracking with auto-depletion and reordering
+- Specialized fields for decoration-specific inventory (ink, thread, screens)
+
+## E-commerce & Storefront
+- Employee-store with live logo application and real-time design previews
+- Corporate-branded storefronts with company-approved products
+- Canvas-based product customizer for self-service design
+- Secure checkout and order tracking for customers
+
+## AI Enhancements
+- GPT-4o for draft quotes and customer assistance
+- Vision AI for artwork complexity analysis and color separation
+- AI-powered production scheduling optimizing machine capacity
+- Automated mockup generation from customer artwork
+
+# User Experience  
+## User Personas
+- **Shop Owners**: Need comprehensive visibility into operations, orders, capacity, and financials
+- **Sales Representatives**: Focus on generating quotes, managing customer relationships, and converting inquiries to orders
+- **Production Staff**: Require clear task assignments, efficient workflows, and mobile-friendly interfaces for shop floor use
+- **Employee Buyers**: Corporate employees purchasing branded merchandise through dedicated storefronts
+- **Administrators**: Manage tenants, user permissions, and system configurations
+
+## Key User Flows
+- Quote creation → approval → order conversion → production → delivery
+- Product catalog management and decoration option configuration
+- Shop floor task management with real-time status updates
+- Customer self-service design, ordering, and tracking
+- Inventory and supply chain management with vendor integration
+</context>
+<PRD>
+# Technical Architecture  
+## System Components
+- **Frontend**: Next.js 15.3.1+ with React 19.1.0+ and TypeScript 5.8.3+
+- **Backend**: Supabase (PostgreSQL, Auth, Storage, Edge Functions)
+- **ETL Service**: Node.js 23.11.0+ microservice (or Supabase Edge Functions)
+- **Styling**: Tailwind CSS 4.1.4+ with Shadcn/UI components
+- **State Management**: Server Components + @tanstack/react-query 5.74.4+
+- **API Layer**: tRPC for type-safe API endpoints
+- **Deployment**: Vercel (Frontend), Supabase Cloud (Backend)
+- **AI Services**: GPT-4o and vision AI integration via secure backends
+
+## Data Models
+- Multi-tenant schema with company as the root entity
+- Core entities: company, users, roles, store, products, product_variants, inventory, orders, line_items, tasks
+- Decoration-specific entities: decoration_technique, logo, decoration_display, imprint_location
+- Production tracking: task assignment, workflow steps, completion metrics
+- Customer and authentication: user profiles, permissions, tenant association
+
+## APIs and Integration
+- Internal tRPC API for frontend-backend communication with end-to-end type safety
+- ETL connectors for Printavo data synchronization
+- Webhook system for real-time external integrations
+- RESTful endpoints for third-party services (payment, shipping)
+- Supabase Realtime for live updates across connected clients
+
+## Infrastructure Requirements
+- Supabase project with sufficient database connections and storage
+- Vercel deployment with appropriate scaling
+- Optional Kubernetes cluster for custom ETL service if not using Edge Functions
+- CI/CD pipeline via GitHub Actions
+- Monitoring and alerting through Sentry and custom dashboards
+
+# Development Roadmap  
+## Phase 1: Foundation & Sync Framework
+- Environment setup with Next.js, Supabase, and authentication
+- Core database schema and migrations implementation
+- Row-Level Security (RLS) policies for multi-tenancy
+- User/role management with appropriate permissions
+- Initial ETL pipeline for syncing Companies/Tenants from Printavo
+- Basic tenant configuration and isolation
+
+## Phase 2: Product & Order System
+- Product catalog with variants, pricing tiers, and decoration constraints
+- Customer management with profiles and ordering history
+- Quote builder with decoration options, artwork upload, and pricing
+- Order management with statuses and line items
+- Production specification generation
+- Screen printing, embroidery, and other decoration technique specifications
+
+## Phase 3: Production & Workflow
+- Task generation based on decoration techniques and order specifications
+- Kanban board with customizable workflow columns
+- Mobile-optimized interfaces for shop floor operations
+- Real-time status updates for tasks and orders
+- Quality control checkpoints and reporting
+- Production metrics tracking
+
+## Phase 4: E-commerce Integration
+- Storefront infrastructure with dynamic theming per tenant
+- Product catalog and customization options
+- Canvas-based product designer with decoration preview
+- Cart and checkout flow with payment processing
+- Customer portal for order history and reorders
+- Proof generation and approval workflow
+
+## Phase 5: Inventory & Warehouse
+- Inventory tracking for blank goods and decorating supplies
+- Purchase order management with vendor integration
+- Receiving and put-away workflows
+- Low stock alerts and reordering suggestions
+- Stock transfers and adjustments tracking
+- Inventory movement history
+
+## Phase 6: Advanced Features & AI
+- AI-assisted quoting and artwork analysis
+- Production scheduling optimization
+- Analytics dashboards for business insights
+- Shipping and fulfillment integration
+- Third-party integrations (accounting, CRM)
+- Advanced reporting and business intelligence
+
+# Logical Dependency Chain
+## Foundation First (Phase 1)
+- Authentication and multi-tenancy must be established before any features
+- Database schema design drives all subsequent development
+- ETL framework enables data migration and synchronization
+- Base UI components and layout system support all interfaces
+
+## Core Operations (Phases 2-3)
+- Product catalog before order management
+- Basic quoting system before production workflow
+- Task engine before shop floor interfaces
+- Real-time updates after core workflow implementation
+
+## Customer-Facing Features (Phase 4)
+- Internal systems must be operational before customer interfaces
+- Product data must be complete before storefront launch
+- Order processing must work before enabling checkout
+- Design tools require product specifications and decoration rules
+
+## Advanced Capabilities (Phases 5-6)
+- Inventory system builds on product and order foundations
+- AI features enhance existing workflows rather than replace them
+- Analytics require sufficient data from operational features
+- Integrations extend the platform after core functionality is stable
+
+# Risks and Mitigations  
+## Technical Challenges
+- **Risk**: Complex multi-tenant data isolation
+  **Mitigation**: Rigorous testing of RLS policies; automated security scanning
+
+- **Risk**: Real-time synchronization across components
+  **Mitigation**: Implement robust retry logic; use offline-first design patterns
+
+- **Risk**: Decoration-specific complexity in product modeling
+  **Mitigation**: Domain expert consultation; flexible schema design; iterative validation
+
+## MVP Definition
+- **Risk**: Scope creep with industry-specific features
+  **Mitigation**: Prioritize features based on user value; phased approach with clear boundaries
+
+- **Risk**: Balancing generic vs. specialized functionality
+  **Mitigation**: Design extensible core with decoration-specific plugins; separation of concerns
+
+- **Risk**: Focusing too heavily on internal vs. customer-facing features
+  **Mitigation**: Parallel development tracks; ensure both operational and revenue features advance
+
+## Resource Constraints
+- **Risk**: Integration complexity with legacy systems
+  **Mitigation**: Well-defined ETL architecture; graceful degradation if integrations fail
+
+- **Risk**: Performance issues with file-heavy operations (artwork)
+  **Mitigation**: CDN utilization; image optimization pipeline; lazy loading strategies
+
+- **Risk**: Development expertise across specialized domains
+  **Mitigation**: Documentation; component-based architecture; knowledge sharing sessions
+
+# Appendix  
+## Industry-Specific Requirements
+- Screen printing production workflow requirements
+- Embroidery digitizing and production considerations
+- DTG (Direct to Garment) and vinyl cutting specifications
+- Industry standard decoration placements and sizing
+
+## Technical Specifications
+- Database ERD and relationship diagrams
+- API endpoint documentation
+- UI component library and design system
+- Authentication flow and security model
+- Deployment architecture and scaling strategy
+</PRD> 

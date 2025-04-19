@@ -1,0 +1,1 @@
+Create modern user interfaces with an elegant frosted glass aesthetic that features translucent surfaces, subtle blur effects, and light reflections. Apply these design principles consistently throughout the application to achieve a cohesive Glassmorphism style that conveys depth, lightness, and visual sophistication while maintaining usability and performance.

@@ -11,6 +11,7 @@ import {
   FileText,
   Home,
   Package,
+  Palette,
   Settings,
   ShoppingCart,
   Users,
@@ -87,6 +88,13 @@ export function SidebarNav() {
       href: "/admin/products",
       variant: "ghost" as const,
       color: "text-orange-500",
+    },
+    {
+      title: "Decorations",
+      icon: <Palette className="h-5 w-5" />,
+      href: "/dashboard/decorations",
+      variant: "ghost" as const,
+      color: "text-purple-500",
     },
     {
       title: "Quotes",
