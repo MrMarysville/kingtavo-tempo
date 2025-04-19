@@ -56,7 +56,7 @@ export default async function OrdersPage() {
           </h1>
           <p className="text-muted-foreground">Manage your customer orders</p>
         </div>
-        <Link href="/dashboard/orders/new">
+        <Link href="/admin/orders/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Create Order
@@ -82,7 +82,7 @@ export default async function OrdersPage() {
           </Card>
         ) : (
           orders.map((order) => (
-            <Link key={order.id} href={`/dashboard/orders/${order.id}`}>
+            <Link key={order.id} href={`/admin/orders/${order.id}`}>
               <Card className="h-full overflow-hidden transition-all hover:border-primary hover:shadow-md bg-card text-card-foreground">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">

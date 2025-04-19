@@ -25,7 +25,7 @@ export default async function CompaniesPage() {
           </h1>
           <p className="text-muted-foreground">Manage your tenant companies</p>
         </div>
-        <Link href="/dashboard/companies/new">
+        <Link href="/admin/companies/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Add Company
@@ -52,7 +52,7 @@ export default async function CompaniesPage() {
         )}
 
         {companies?.map((company) => (
-          <Link key={company.id} href={`/dashboard/companies/${company.id}`}>
+          <Link key={company.id} href={`/admin/companies/${company.id}`}>
             <Card className="h-full overflow-hidden transition-all hover:border-primary hover:shadow-md">
               <CardHeader className="pb-2">
                 <CardTitle>{company.name}</CardTitle>

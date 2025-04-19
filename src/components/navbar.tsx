@@ -20,10 +20,16 @@ export default async function Navbar() {
           {user ? (
             <>
               <Link
-                href="/dashboard"
+                href="/admin"
                 className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
               >
-                <Button>Dashboard</Button>
+                <Button>Admin</Button>
+              </Link>
+              <Link
+                href="/store"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+              >
+                <Button variant="outline">Store</Button>
               </Link>
               <UserProfile />
             </>

@@ -57,12 +57,14 @@ export default async function TasksPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Tasks
+          </h1>
           <p className="text-muted-foreground">Manage your production tasks</p>
         </div>
         <div className="flex gap-2">
           <Tabs defaultValue="kanban" className="w-[400px]">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 bg-background border border-input">
               <TabsTrigger value="kanban" className="flex items-center gap-2">
                 <LayoutGrid className="h-4 w-4" />
                 Kanban
@@ -83,7 +85,7 @@ export default async function TasksPage() {
       </div>
 
       {error && (
-        <div className="rounded-md bg-destructive/15 p-4 text-destructive">
+        <div className="rounded-md bg-destructive/15 p-4 text-destructive border border-destructive/20">
           <p>Error loading tasks: {error.message}</p>
         </div>
       )}
@@ -107,13 +109,13 @@ export default async function TasksPage() {
                 <div className="space-y-3">
                   {!tasksByStatus["to-do"] ||
                   tasksByStatus["to-do"].length === 0 ? (
-                    <div className="border border-dashed rounded-lg p-4 text-center text-muted-foreground">
+                    <div className="border border-dashed border-input rounded-lg p-4 text-center text-muted-foreground">
                       No tasks
                     </div>
                   ) : (
                     tasksByStatus["to-do"].map((task) => (
                       <Link key={task.id} href={`/dashboard/tasks/${task.id}`}>
-                        <Card className="hover:border-primary hover:shadow-sm transition-all">
+                        <Card className="hover:border-primary hover:shadow-sm transition-all bg-card text-card-foreground">
                           <CardHeader className="p-4 pb-2">
                             <div className="flex justify-between items-start">
                               <CardTitle className="text-base">
@@ -179,13 +181,13 @@ export default async function TasksPage() {
                 <div className="space-y-3">
                   {!tasksByStatus["in-progress"] ||
                   tasksByStatus["in-progress"].length === 0 ? (
-                    <div className="border border-dashed rounded-lg p-4 text-center text-muted-foreground">
+                    <div className="border border-dashed border-input rounded-lg p-4 text-center text-muted-foreground">
                       No tasks
                     </div>
                   ) : (
                     tasksByStatus["in-progress"].map((task) => (
                       <Link key={task.id} href={`/dashboard/tasks/${task.id}`}>
-                        <Card className="hover:border-primary hover:shadow-sm transition-all">
+                        <Card className="hover:border-primary hover:shadow-sm transition-all bg-card text-card-foreground">
                           <CardHeader className="p-4 pb-2">
                             <div className="flex justify-between items-start">
                               <CardTitle className="text-base">
@@ -251,13 +253,13 @@ export default async function TasksPage() {
                 <div className="space-y-3">
                   {!tasksByStatus["review"] ||
                   tasksByStatus["review"].length === 0 ? (
-                    <div className="border border-dashed rounded-lg p-4 text-center text-muted-foreground">
+                    <div className="border border-dashed border-input rounded-lg p-4 text-center text-muted-foreground">
                       No tasks
                     </div>
                   ) : (
                     tasksByStatus["review"].map((task) => (
                       <Link key={task.id} href={`/dashboard/tasks/${task.id}`}>
-                        <Card className="hover:border-primary hover:shadow-sm transition-all">
+                        <Card className="hover:border-primary hover:shadow-sm transition-all bg-card text-card-foreground">
                           <CardHeader className="p-4 pb-2">
                             <div className="flex justify-between items-start">
                               <CardTitle className="text-base">
@@ -323,13 +325,13 @@ export default async function TasksPage() {
                 <div className="space-y-3">
                   {!tasksByStatus["done"] ||
                   tasksByStatus["done"].length === 0 ? (
-                    <div className="border border-dashed rounded-lg p-4 text-center text-muted-foreground">
+                    <div className="border border-dashed border-input rounded-lg p-4 text-center text-muted-foreground">
                       No tasks
                     </div>
                   ) : (
                     tasksByStatus["done"].map((task) => (
                       <Link key={task.id} href={`/dashboard/tasks/${task.id}`}>
-                        <Card className="hover:border-primary hover:shadow-sm transition-all">
+                        <Card className="hover:border-primary hover:shadow-sm transition-all bg-card text-card-foreground">
                           <CardHeader className="p-4 pb-2">
                             <div className="flex justify-between items-start">
                               <CardTitle className="text-base">
@@ -382,7 +384,7 @@ export default async function TasksPage() {
             </div>
           </TabsContent>
           <TabsContent value="calendar" className="mt-0">
-            <div className="rounded-lg border p-6">
+            <div className="rounded-lg border border-input p-6">
               <div className="flex flex-col items-center justify-center h-[400px]">
                 <Calendar className="h-16 w-16 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium">Calendar View</h3>

@@ -26,7 +26,7 @@ export default async function ProductsPage() {
           </h1>
           <p className="text-muted-foreground">Manage your product catalog</p>
         </div>
-        <Link href="/dashboard/products/new">
+        <Link href="/admin/products/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Add Product
@@ -53,7 +53,7 @@ export default async function ProductsPage() {
         )}
 
         {products?.map((product) => (
-          <Link key={product.id} href={`/dashboard/products/${product.id}`}>
+          <Link key={product.id} href={`/admin/products/${product.id}`}>
             <Card className="h-full overflow-hidden transition-all hover:border-primary hover:shadow-md bg-card text-card-foreground">
               <CardHeader className="pb-2">
                 <CardTitle>{product.name}</CardTitle>

@@ -6,36 +6,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, Receipt } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "../../../../supabase/server";
 
-export default async function OrdersPage() {
+export default async function InvoicesPage() {
   const supabase = await createClient();
   const { data: orders, error } = await supabase
     .from("orders")
     .select("*, companies(name), customers(name)")
     .order("created_at", { ascending: false });
 
-  // Get status badge color based on order status
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "processing":
-        return "bg-blue-100 text-blue-800";
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   // Get payment status badge color
   const getPaymentStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
       case "paid":
         return "bg-green-100 text-green-800";
       case "unpaid":
@@ -47,26 +31,31 @@ export default async function OrdersPage() {
     }
   };
 
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            Orders
+            Invoices
           </h1>
-          <p className="text-muted-foreground">Manage your customer orders</p>
+          <p className="text-muted-foreground">Manage customer invoices</p>
         </div>
-        <Link href="/dashboard/orders/new">
+        <Link href="/admin/invoices/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Create Order
+            Create Invoice
           </Button>
         </Link>
       </div>
 
       {error && (
         <div className="rounded-md bg-destructive/15 p-4 text-destructive border border-destructive/20">
-          <p>Error loading orders: {error.message}</p>
+          <p>Error loading invoices: {error.message}</p>
         </div>
       )}
 
@@ -74,25 +63,25 @@ export default async function OrdersPage() {
         {!orders || orders.length === 0 ? (
           <Card className="col-span-full">
             <CardHeader>
-              <CardTitle>No orders found</CardTitle>
+              <CardTitle>No invoices found</CardTitle>
               <CardDescription>
-                Get started by creating your first order
+                Get started by creating your first invoice
               </CardDescription>
             </CardHeader>
           </Card>
         ) : (
           orders.map((order) => (
-            <Link key={order.id} href={`/dashboard/orders/${order.id}`}>
+            <Link key={order.id} href={`/admin/invoices/${order.id}`}>
               <Card className="h-full overflow-hidden transition-all hover:border-primary hover:shadow-md bg-card text-card-foreground">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-center">
                     <CardTitle className="truncate">
-                      Order #{order.id.substring(0, 8)}
+                      Invoice #{order.id.substring(0, 8).toUpperCase()}
                     </CardTitle>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(order.payment_status)}`}
                     >
-                      {order.status}
+                      {order.payment_status}
                     </span>
                   </div>
                   <CardDescription>
@@ -109,11 +98,18 @@ export default async function OrdersPage() {
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Payment:</span>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(order.payment_status)}`}
-                      >
-                        {order.payment_status}
+                      <span className="text-sm font-medium">Date:</span>
+                      <span className="text-sm">
+                        {formatDate(order.created_at)}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Due Date:</span>
+                      <span className="text-sm">
+                        {order.due_date
+                          ? formatDate(order.due_date)
+                          : "On receipt"}
                       </span>
                     </div>
 
@@ -122,10 +118,6 @@ export default async function OrdersPage() {
                       <span className="text-sm">
                         {(order.companies as any)?.name || "Unknown"}
                       </span>
-                    </div>
-
-                    <div className="text-xs text-muted-foreground mt-2">
-                      Created: {new Date(order.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </CardContent>

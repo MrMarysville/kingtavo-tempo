@@ -75,7 +75,9 @@ export default async function TaskDetailPage({
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold tracking-tight">{task.task_type}</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          {task.task_type}
+        </h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -191,7 +193,7 @@ export default async function TaskDetailPage({
                   <h3 className="text-sm font-medium text-muted-foreground">
                     Notes
                   </h3>
-                  <div className="mt-1 rounded-md border p-3">
+                  <div className="mt-1 rounded-md border border-input p-3">
                     <p className="whitespace-pre-line">{task.notes}</p>
                   </div>
                 </div>
@@ -252,7 +254,7 @@ export default async function TaskDetailPage({
                 </Avatar>
                 <div className="flex-1">
                   <textarea
-                    className="w-full rounded-md border p-2 text-sm"
+                    className="w-full rounded-md border border-input p-2 text-sm bg-background"
                     placeholder="Add a comment..."
                     rows={3}
                   ></textarea>

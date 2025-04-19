@@ -1,10 +1,12 @@
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
+  const res = NextResponse.next();
+  const pathname = req.nextUrl.pathname;
 
+  // Create Supabase client for auth
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -14,26 +16,50 @@ export async function middleware(req: NextRequest) {
           return req.cookies.getAll().map(({ name, value }) => ({
             name,
             value,
-          }))
+          }));
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            req.cookies.set(name, value)
-            res.cookies.set(name, value, options)
-          })
+            req.cookies.set(name, value);
+            res.cookies.set(name, value, options);
+          });
         },
       },
-    }
-  )
+    },
+  );
 
   // Refresh session if expired - required for Server Components
-  const { data: { session }, error } = await supabase.auth.getSession()
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
 
   if (error) {
-    console.error('Auth session error:', error)
+    console.error("Auth session error:", error);
   }
 
-  return res
+  // Handle tenant-specific routing
+  if (pathname.startsWith("/admin") || pathname.startsWith("/dashboard")) {
+    // Admin routes require authentication
+    if (!session) {
+      // Redirect to sign-in page if not authenticated
+      const redirectUrl = new URL("/sign-in", req.url);
+      redirectUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    // Role-based access control is handled in the layout component
+    // This allows for more detailed checks with database queries
+    // which aren't easily done in middleware
+  }
+
+  // Handle legacy dashboard routes - redirect to admin
+  if (pathname.startsWith("/dashboard")) {
+    const newPath = pathname.replace("/dashboard", "/admin");
+    return NextResponse.redirect(new URL(newPath, req.url));
+  }
+
+  return res;
 }
 
 // Ensure the middleware is only called for relevant paths
@@ -45,7 +71,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public (public files)
+     * - api (API routes)
      */
-    '/((?!_next/static|_next/image|favicon.ico|public|api).*)',
+    "/((?!_next/static|_next/image|favicon.ico|public|api).*)",
   ],
-}
+};

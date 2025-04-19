@@ -1,5 +1,13 @@
 import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
@@ -25,51 +33,58 @@ export default async function ForgotPassword(props: {
     <>
       <Navbar />
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-8">
-        <div className="w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-sm">
-          <UrlProvider>
-            <form className="flex flex-col space-y-6">
-              <div className="space-y-2 text-center">
-                <h1 className="text-3xl font-semibold tracking-tight">Reset Password</h1>
-                <p className="text-sm text-muted-foreground">
-                  Already have an account?{" "}
-                  <Link
-                    className="text-primary font-medium hover:underline transition-all"
-                    href="/sign-in"
-                  >
-                    Sign in
-                  </Link>
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    required
-                    className="w-full"
-                  />
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold tracking-tight">
+              Reset Password
+            </CardTitle>
+            <CardDescription>
+              Enter your email to receive a password reset link
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <UrlProvider>
+              <form className="flex flex-col space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <SubmitButton
-                formAction={forgotPasswordAction}
-                pendingText="Sending reset link..."
-                className="w-full"
+                <SubmitButton
+                  formAction={forgotPasswordAction}
+                  pendingText="Sending reset link..."
+                  className="w-full"
+                >
+                  Reset Password
+                </SubmitButton>
+
+                <FormMessage message={searchParams} />
+              </form>
+            </UrlProvider>
+          </CardContent>
+          <CardFooter className="flex justify-center border-t p-4">
+            <div className="text-sm text-muted-foreground">
+              Remember your password?{" "}
+              <Link
+                className="text-primary font-medium hover:underline transition-all"
+                href="/sign-in"
               >
-                Reset Password
-              </SubmitButton>
-
-              <FormMessage message={searchParams} />
-            </form>
-          </UrlProvider>
+                Sign in
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
+        <div className="mt-4">
+          <SmtpMessage />
         </div>
-        <SmtpMessage />
       </div>
     </>
   );
