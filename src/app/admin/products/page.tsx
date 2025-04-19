@@ -9,13 +9,31 @@ import {
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "../../../../supabase/server";
+import { getUserCompanyAndRole } from "@/utils/auth";
 
 export default async function ProductsPage() {
   const supabase = await createClient();
-  const { data: products, error } = await supabase
+
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Get user's company and role information
+  const userInfo = await getUserCompanyAndRole(user!.id);
+
+  // Fetch products based on user role and company
+  let productsQuery = supabase
     .from("products")
     .select("*, companies(name)")
     .order("created_at", { ascending: false });
+
+  // If not an owner, only show products from the user's company
+  if (userInfo?.roleName !== "owner" && userInfo?.companyId) {
+    productsQuery = productsQuery.eq("company_id", userInfo.companyId);
+  }
+
+  const { data: products, error } = await productsQuery;
 
   return (
     <div className="space-y-6">

@@ -3,6 +3,7 @@ import DashboardNavbar from "@/components/dashboard-navbar";
 import { redirect } from "next/navigation";
 import { createClient } from "../../../supabase/server";
 import { ThemeProvider } from "@/components/theme-provider";
+import { getUserCompanyAndRole } from "@/utils/auth";
 
 export default async function DashboardLayout({
   children,
@@ -17,6 +18,14 @@ export default async function DashboardLayout({
 
   if (!user) {
     return redirect("/sign-in");
+  }
+
+  // Get user's company and role information
+  const userInfo = await getUserCompanyAndRole(user.id);
+
+  // Users must have a company assigned to access the dashboard
+  if (!userInfo || !userInfo.companyId) {
+    return redirect("/store");
   }
 
   return (

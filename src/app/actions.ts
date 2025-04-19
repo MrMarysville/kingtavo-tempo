@@ -3,6 +3,7 @@
 import { createClient } from "../../supabase/server";
 import { encodedRedirect } from "@/utils/utils";
 import { revalidatePath } from "next/cache";
+import { getUserCompanyId, hasCompanyAccess } from "@/utils/auth";
 
 export async function signInAction(formData: FormData) {
   const email = formData.get("email") as string;
@@ -19,7 +20,7 @@ export async function signInAction(formData: FormData) {
     return { error: error.message };
   }
 
-  return encodedRedirect("success", "/dashboard", "Successfully signed in");
+  return encodedRedirect("success", "/admin", "Successfully signed in");
 }
 
 export async function signUpAction(formData: FormData) {
@@ -57,7 +58,7 @@ export async function forgotPasswordAction(formData: FormData) {
   const supabase = await createClient();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${site_url}/dashboard/reset-password`,
+    redirectTo: `${site_url}/admin/reset-password`,
   });
 
   if (error) {
@@ -87,11 +88,7 @@ export async function resetPasswordAction(formData: FormData) {
     return { error: error.message };
   }
 
-  return encodedRedirect(
-    "success",
-    "/dashboard",
-    "Your password has been reset",
-  );
+  return encodedRedirect("success", "/admin", "Your password has been reset");
 }
 
 export async function createCompanyAction(formData: FormData) {
@@ -102,6 +99,24 @@ export async function createCompanyAction(formData: FormData) {
   const secondary_color = formData.get("secondary_color") as string;
 
   const supabase = await createClient();
+
+  // Only owners can create companies
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Unauthorized" };
+  }
+
+  const { data: userData } = await supabase
+    .from("users")
+    .select("roles(name)")
+    .eq("id", user.id)
+    .single();
+
+  if (!userData || userData.roles?.name !== "owner") {
+    return { error: "Unauthorized: Only owners can create companies" };
+  }
 
   const { data, error } = await supabase
     .from("companies")
@@ -118,10 +133,10 @@ export async function createCompanyAction(formData: FormData) {
     return { error: error.message };
   }
 
-  revalidatePath("/dashboard/companies");
+  revalidatePath("/admin/companies");
   return encodedRedirect(
     "success",
-    "/dashboard/companies",
+    "/admin/companies",
     "Company created successfully",
   );
 }
@@ -135,6 +150,20 @@ export async function createProductAction(formData: FormData) {
   const is_active = formData.get("is_active") === "on";
 
   const supabase = await createClient();
+
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Unauthorized" };
+  }
+
+  // Check if user has access to this company
+  const hasAccess = await hasCompanyAccess(user.id, company_id);
+  if (!hasAccess) {
+    return { error: "Unauthorized: You don't have access to this company" };
+  }
 
   const { data, error } = await supabase
     .from("products")
@@ -152,10 +181,10 @@ export async function createProductAction(formData: FormData) {
     return { error: error.message };
   }
 
-  revalidatePath("/dashboard/products");
+  revalidatePath("/admin/products");
   return encodedRedirect(
     "success",
-    "/dashboard/products",
+    "/admin/products",
     "Product created successfully",
   );
 }
@@ -177,6 +206,20 @@ export async function createCustomerAction(formData: FormData) {
 
   const supabase = await createClient();
 
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Unauthorized" };
+  }
+
+  // Check if user has access to this company
+  const hasAccess = await hasCompanyAccess(user.id, company_id);
+  if (!hasAccess) {
+    return { error: "Unauthorized: You don't have access to this company" };
+  }
+
   const { data, error } = await supabase
     .from("customers")
     .insert({
@@ -193,10 +236,10 @@ export async function createCustomerAction(formData: FormData) {
     return { error: error.message };
   }
 
-  revalidatePath("/dashboard/customers");
+  revalidatePath("/admin/customers");
   return encodedRedirect(
     "success",
-    "/dashboard/customers",
+    "/admin/customers",
     "Customer created successfully",
   );
 }
@@ -212,6 +255,35 @@ export async function createTaskAction(formData: FormData) {
   const notes = formData.get("notes") as string;
 
   const supabase = await createClient();
+
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { error: "Unauthorized" };
+  }
+
+  // Check if user has access to this company
+  const hasAccess = await hasCompanyAccess(user.id, company_id);
+  if (!hasAccess) {
+    return { error: "Unauthorized: You don't have access to this company" };
+  }
+
+  // If order_id is provided, verify it belongs to the same company
+  if (order_id) {
+    const { data: orderData } = await supabase
+      .from("orders")
+      .select("company_id")
+      .eq("id", order_id)
+      .single();
+
+    if (!orderData || orderData.company_id !== company_id) {
+      return {
+        error: "Invalid order: Order does not belong to the selected company",
+      };
+    }
+  }
 
   const { data, error } = await supabase
     .from("tasks")
@@ -231,10 +303,10 @@ export async function createTaskAction(formData: FormData) {
     return { error: error.message };
   }
 
-  revalidatePath("/dashboard/tasks");
+  revalidatePath("/admin/tasks");
   return encodedRedirect(
     "success",
-    "/dashboard/tasks",
+    "/admin/tasks",
     "Task created successfully",
   );
 }

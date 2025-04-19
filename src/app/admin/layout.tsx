@@ -3,6 +3,7 @@ import AdminNavbar from "@/components/admin/navbar";
 import { redirect } from "next/navigation";
 import { createClient } from "../../../supabase/server";
 import { ThemeProvider } from "@/components/theme-provider";
+import { getUserCompanyAndRole } from "@/utils/auth";
 
 export default async function AdminLayout({
   children,
@@ -19,19 +20,20 @@ export default async function AdminLayout({
     return redirect("/sign-in");
   }
 
-  // Check if user has admin role
-  const { data: userData, error: userError } = await supabase
-    .from("users")
-    .select("role_id, roles(name)")
-    .eq("id", user.id)
-    .single();
+  // Get user's company and role information
+  const userInfo = await getUserCompanyAndRole(user.id);
 
   // If no role or not admin role, redirect to store
   if (
-    userError ||
-    !userData ||
-    (userData.roles?.name !== "admin" && userData.roles?.name !== "owner")
+    !userInfo ||
+    (userInfo.roleName !== "admin" && userInfo.roleName !== "owner")
   ) {
+    return redirect("/store");
+  }
+
+  // If user is not an owner and doesn't have a company assigned, redirect to store
+  // Owners can access the admin panel without a company (they can manage all companies)
+  if (userInfo.roleName !== "owner" && !userInfo.companyId) {
     return redirect("/store");
   }
 

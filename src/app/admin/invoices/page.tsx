@@ -9,13 +9,38 @@ import {
 import { Plus, Receipt } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "../../../../supabase/server";
+import { getUserCompanyAndRole } from "@/utils/auth";
+
+import { redirect } from "next/navigation";
 
 export default async function InvoicesPage() {
   const supabase = await createClient();
-  const { data: orders, error } = await supabase
+
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Redirect if user is not authenticated
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  // Get user's company and role information
+  const userInfo = await getUserCompanyAndRole(user.id);
+
+  // Fetch orders based on user role and company
+  let ordersQuery = supabase
     .from("orders")
     .select("*, companies(name), customers(name)")
     .order("created_at", { ascending: false });
+
+  // If not an owner, only show orders from the user's company
+  if (userInfo?.roleName !== "owner" && userInfo?.companyId) {
+    ordersQuery = ordersQuery.eq("company_id", userInfo.companyId);
+  }
+
+  const { data: orders, error } = await ordersQuery;
 
   // Get payment status badge color
   const getPaymentStatusColor = (status: string) => {

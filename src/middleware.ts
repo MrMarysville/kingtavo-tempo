@@ -48,6 +48,19 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(redirectUrl);
     }
 
+    // Check for company-specific resource access
+    // Example: /admin/companies/[companyId] or /admin/customers/[customerId]
+    // This is a basic pattern check - more detailed checks are in the layout components
+    const companyResourcePattern =
+      /\/(companies|customers|products|orders|invoices|tasks)\/([^/]+)$/;
+    const match = pathname.match(companyResourcePattern);
+
+    if (match && match[2] && !match[2].includes("new")) {
+      // This is a company-specific resource - detailed access check will be in the page component
+      // We can't do detailed DB checks here efficiently, so we'll let the page component handle it
+      // Just adding the pattern detection for future expansion
+    }
+
     // Role-based access control is handled in the layout component
     // This allows for more detailed checks with database queries
     // which aren't easily done in middleware

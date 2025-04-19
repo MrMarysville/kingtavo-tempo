@@ -9,12 +9,28 @@ import {
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "../../../../supabase/server";
+import { getUserCompanyAndRole } from "@/utils/auth";
 
 export default async function CompaniesPage() {
   const supabase = await createClient();
-  const { data: companies, error } = await supabase
-    .from("companies")
-    .select("*");
+
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Get user's company and role information
+  const userInfo = await getUserCompanyAndRole(user!.id);
+
+  // Fetch companies based on user role
+  let companiesQuery = supabase.from("companies").select("*");
+
+  // If not an owner, only show the user's company
+  if (userInfo?.roleName !== "owner" && userInfo?.companyId) {
+    companiesQuery = companiesQuery.eq("id", userInfo.companyId);
+  }
+
+  const { data: companies, error } = await companiesQuery;
 
   return (
     <div className="space-y-6">
@@ -25,12 +41,15 @@ export default async function CompaniesPage() {
           </h1>
           <p className="text-muted-foreground">Manage your tenant companies</p>
         </div>
-        <Link href="/admin/companies/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Company
-          </Button>
-        </Link>
+        {/* Only show Add Company button for owners */}
+        {userInfo?.roleName === "owner" && (
+          <Link href="/admin/companies/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Company
+            </Button>
+          </Link>
+        )}
       </div>
 
       {error && (
@@ -45,7 +64,9 @@ export default async function CompaniesPage() {
             <CardHeader>
               <CardTitle>No companies found</CardTitle>
               <CardDescription>
-                Get started by creating your first company
+                {userInfo?.roleName === "owner"
+                  ? "Get started by creating your first company"
+                  : "You don't have access to any companies"}
               </CardDescription>
             </CardHeader>
           </Card>

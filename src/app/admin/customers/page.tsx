@@ -9,13 +9,31 @@ import {
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "../../../../supabase/server";
+import { getUserCompanyAndRole } from "@/utils/auth";
 
 export default async function CustomersPage() {
   const supabase = await createClient();
-  const { data: customers, error } = await supabase
+
+  // Get current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Get user's company and role information
+  const userInfo = await getUserCompanyAndRole(user!.id);
+
+  // Fetch customers based on user role and company
+  let customersQuery = supabase
     .from("customers")
     .select("*, companies(name)")
     .order("created_at", { ascending: false });
+
+  // If not an owner, only show customers from the user's company
+  if (userInfo?.roleName !== "owner" && userInfo?.companyId) {
+    customersQuery = customersQuery.eq("company_id", userInfo.companyId);
+  }
+
+  const { data: customers, error } = await customersQuery;
 
   return (
     <div className="space-y-6">
