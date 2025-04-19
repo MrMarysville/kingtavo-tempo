@@ -1,0 +1,11 @@
+# Add patterns to ignore here, one per line
+# Example:
+# *.log
+# tmp/
+/nodemodules
+/.next
+/docs
+/scripts
+/tasks
+.eslintrc.json
+.eslintignore
