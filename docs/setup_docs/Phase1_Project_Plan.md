@@ -16,7 +16,7 @@ _This suite of six phase-based plans provides LLM-ready, task-and-subtask breakd
      ```
      *(Ensure you have Node.js 23.11.0+ installed)*
    - Set up Tailwind CSS 4.1.4+, ESLint, Prettier, Husky hooks.
-   - Configure shadcn/ui & Flowbite 3.1.2+ with Flowbite-React 0.11.7+ components (Refer to `Phase2_Flowbite_Setup_Guide.md`).
+   - Configure Shadcn/UI components (Refer to `Phase2_UI_UX.md`).
    - Establish project structure (feature-based, e.g., `src/features/quotes`).
 
 2. **Authentication & Multi-Tenancy** (2 weeks)
@@ -25,7 +25,7 @@ _This suite of six phase-based plans provides LLM-ready, task-and-subtask breakd
    - Configure Supabase Auth (Email/Password initially).
    - Implement Row-Level Security (RLS) policies for multi-tenancy.
    - Create auth flow using Next.js Middleware and Supabase SSR helpers.
-   - Build user/org onboarding and profile UI using Flowbite components.
+   - Build user/org onboarding and profile UI using Shadcn/UI components.
    - Implement role-based access control (RBAC) checks (in middleware and/or tRPC procedures).
 
 3. **Database Schema & Migrations** (3 weeks)

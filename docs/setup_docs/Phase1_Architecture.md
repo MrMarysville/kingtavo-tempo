@@ -11,7 +11,7 @@ _This document outlines the high-level architecture of the Kingtavo platform, in
 *   **Frontend:** Next.js 15.3.1+ with React 19.1.0+ and TypeScript 5.8.3+
 *   **Backend:** Supabase (PostgreSQL, Auth, Storage, Edge Functions)
 *   **ETL Service:** Node.js 23.11.0+ microservice (or Supabase Edge Functions)
-*   **Styling:** Tailwind CSS 4.1.4+ with Flowbite 3.1.2+ and Flowbite-React 0.11.7+
+*   **Styling:** Tailwind CSS 4.1.4+ with Shadcn/UI components
 *   **State Management:** Server Components + @tanstack/react-query 5.74.4+
 *   **API Layer:** tRPC for type-safe API endpoints
 *   **Deployment:** Vercel (Frontend), Supabase Cloud (Backend)
@@ -194,4 +194,4 @@ sequenceDiagram
 
 ---
 
-*This consolidated document combines the architectural plan and visual diagrams.* 
+*This consolidated document combines the architectural plan and visual diagrams.*
