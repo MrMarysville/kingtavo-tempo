@@ -6,6 +6,33 @@ export const dimensionSchema = z.number().positive("Dimension must be positive")
 export const temperatureSchema = z.number().min(0, "Temperature must be non-negative");
 export const countSchema = z.number().int().min(1, "Count must be at least 1");
 
+// New detailed color schema for specific systems like Pantone or thread charts
+export const detailedColorSchema = z.object({
+  value: z.string().min(1, "Color value is required"),
+  system: z.enum([
+    "Pantone", 
+    "RGB", 
+    "HEX", 
+    "CMYK", 
+    "Madeira Polyneon", 
+    "Madeira Classic Rayon", 
+    "Isacord Polyester", 
+    "Robison-Anton Polyester", 
+    "Custom" // For any other non-standard system or custom mix
+  ], {
+    errorMap: () => ({ message: "Invalid color system" }),
+  }),
+  description: z.string().optional(), // Optional description or name
+});
+
+// New measurement schema including units
+export const measurementSchema = z.object({
+  value: z.number().positive("Measurement value must be positive"),
+  unit: z.enum(["in", "cm", "mm"], {
+    errorMap: () => ({ message: "Invalid unit of measurement" }),
+  }),
+});
+
 // Base decoration technique schema
 export const decorationTechniqueSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -20,7 +47,7 @@ export const screenPrintingSchema = z.object({
   ink_type: z.enum(["plastisol", "water-based", "discharge", "specialty"], {
     errorMap: () => ({ message: "Invalid ink type" }),
   }),
-  ink_color: colorSchema.optional(),
+  ink_color: detailedColorSchema.optional(),
   ink_opacity: z.enum(["low", "medium", "high"], {
     errorMap: () => ({ message: "Invalid opacity level" }),
   }).optional(),
@@ -44,7 +71,7 @@ export const embroiderySchema = z.object({
   }),
   thread_weight: z.string().optional(),
   thread_brand: z.string().optional(),
-  thread_color: colorSchema.optional(),
+  thread_color: detailedColorSchema.optional(),
   stitch_type: z.enum(["satin", "fill", "running", "tatami"], {
     errorMap: () => ({ message: "Invalid stitch type" }),
   }).optional(),
@@ -102,8 +129,8 @@ export const vinylSchema = z.object({
 export const decorationPlacementSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
-  max_width: dimensionSchema.optional(),
-  max_height: dimensionSchema.optional(),
+  max_width: measurementSchema.optional(),
+  max_height: measurementSchema.optional(),
   position_x: z.number().optional(),
   position_y: z.number().optional(),
   reference_point: z.enum(["collar", "shoulder seam", "center", "bottom hem"], {
@@ -131,8 +158,8 @@ export const lineItemDecorationSchema = z.object({
   placement_id: z.string().uuid("Invalid placement ID"),
   artwork_id: z.string().uuid("Invalid artwork ID").optional(),
   colors_count: countSchema.optional(),
-  width: dimensionSchema.optional(),
-  height: dimensionSchema.optional(),
+  width: measurementSchema.optional(),
+  height: measurementSchema.optional(),
   notes: z.string().optional(),
   price: z.number().min(0, "Price must be non-negative"),
 });
@@ -143,10 +170,10 @@ export const decorationDetailsJsonSchema = z.object({
     errorMap: () => ({ message: "Invalid decoration technique" }),
   }),
   placement: z.string().min(1, "Placement is required"),
-  colors: z.array(z.string()).optional(),
+  colors: z.array(detailedColorSchema).optional(),
   colors_count: countSchema.optional(),
-  width: dimensionSchema.optional(),
-  height: dimensionSchema.optional(),
+  width: measurementSchema.optional(),
+  height: measurementSchema.optional(),
   artwork_url: z.string().url("Invalid artwork URL").optional(),
   notes: z.string().optional(),
   
@@ -167,3 +194,5 @@ export type DecorationPlacement = z.infer<typeof decorationPlacementSchema>;
 export type DecorationUpcharge = z.infer<typeof decorationUpchargeSchema>;
 export type LineItemDecoration = z.infer<typeof lineItemDecorationSchema>;
 export type DecorationDetailsJson = z.infer<typeof decorationDetailsJsonSchema>;
+export type Measurement = z.infer<typeof measurementSchema>;
+export type DetailedColor = z.infer<typeof detailedColorSchema>;
